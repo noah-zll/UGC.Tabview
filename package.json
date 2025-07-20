@@ -1,0 +1,26 @@
+{
+  "name": "com.ugc.tabview",
+  "displayName": "UGC.Tabview",
+  "category": "UGC",
+  "description": "A flexible tab view component for Unity UI that supports page switching and data refreshing.",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "keywords": [
+    "UI",
+    "TabView",
+    "Tabs",
+    "UIComponents"
+  ],
+  "author": {
+    "name": "Noah",
+    "email": "support@ugc.com",
+    "url": "https://ugc.com/"
+  },
+  "dependencies": {
+    "com.unity.ugui": "1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/ugc/UGC.Tabview.git"
+  }
+}
