@@ -14,6 +14,7 @@ namespace UGC.Tabview.Editor
     {
         // 序列化属性
         private SerializedProperty modeProperty;
+        private SerializedProperty enableStylerProperty;
         
         // 折叠状态
         private bool showTabs = true;
@@ -37,6 +38,7 @@ namespace UGC.Tabview.Editor
         {
             // 获取序列化属性
             modeProperty = serializedObject.FindProperty("mode");
+            enableStylerProperty = serializedObject.FindProperty("enableStyler");
             
             // 获取当前样式和动画设置
             TabViewController controller = (TabViewController)target;
@@ -325,23 +327,30 @@ namespace UGC.Tabview.Editor
         {
             EditorGUILayout.LabelField("样式设置", EditorStyles.boldLabel);
             
-            EditorGUILayout.LabelField("正常状态", EditorStyles.boldLabel);
-            EditorGUI.BeginChangeCheck();
-            normalBgColor = EditorGUILayout.ColorField("背景颜色", normalBgColor);
-            normalTextColor = EditorGUILayout.ColorField("文本颜色", normalTextColor);
+            EditorGUILayout.PropertyField(enableStylerProperty, new GUIContent("启用样式器"));
             
             EditorGUILayout.Space();
             
-            EditorGUILayout.LabelField("选中状态", EditorStyles.boldLabel);
-            selectedBgColor = EditorGUILayout.ColorField("背景颜色", selectedBgColor);
-            selectedTextColor = EditorGUILayout.ColorField("文本颜色", selectedTextColor);
-            
-            if (EditorGUI.EndChangeCheck())
+            if (enableStylerProperty.boolValue)
             {
-                TabViewStyler styler = new TabViewStyler();
-                styler.SetNormalStyle(normalBgColor, normalTextColor);
-                styler.SetSelectedStyle(selectedBgColor, selectedTextColor);
-                controller.SetStyler(styler);
+                EditorGUILayout.LabelField("正常状态", EditorStyles.boldLabel);
+                EditorGUI.BeginChangeCheck();
+                normalBgColor = EditorGUILayout.ColorField("背景颜色", normalBgColor);
+                normalTextColor = EditorGUILayout.ColorField("文本颜色", normalTextColor);
+                
+                EditorGUILayout.Space();
+                
+                EditorGUILayout.LabelField("选中状态", EditorStyles.boldLabel);
+                selectedBgColor = EditorGUILayout.ColorField("背景颜色", selectedBgColor);
+                selectedTextColor = EditorGUILayout.ColorField("文本颜色", selectedTextColor);
+                
+                if (EditorGUI.EndChangeCheck())
+                {
+                    TabViewStyler styler = new TabViewStyler();
+                    styler.SetNormalStyle(normalBgColor, normalTextColor);
+                    styler.SetSelectedStyle(selectedBgColor, selectedTextColor);
+                    controller.SetStyler(styler);
+                }
             }
         }
         

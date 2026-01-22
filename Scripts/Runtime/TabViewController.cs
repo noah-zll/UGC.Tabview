@@ -54,6 +54,12 @@ namespace UGC.Tabview
         }
         
         /// <summary>
+        /// 是否启用样式器
+        /// </summary>
+        [SerializeField]
+        private bool enableStyler = true;
+
+        /// <summary>
         /// 样式器
         /// </summary>
         private TabViewStyler styler = new TabViewStyler();
@@ -150,7 +156,10 @@ namespace UGC.Tabview
             tabItem.SetOnClickListener(() => SwitchToTab(tabId));
             
             // 应用样式
-            styler.ApplyStyle(tabItem, false);
+            if (enableStyler)
+            {
+                styler.ApplyStyle(tabItem, false);
+            }
             
             // 添加到集合
             tabs.Add(tabId, tabItem);
@@ -217,13 +226,19 @@ namespace UGC.Tabview
             if (!string.IsNullOrEmpty(CurrentTabId) && tabs.TryGetValue(CurrentTabId, out TabItem currentTab))
             {
                 currentTab.Deselect();
-                styler.ApplyStyle(currentTab, false);
+                if (enableStyler)
+                {
+                    styler.ApplyStyle(currentTab, false);
+                }
             }
             
             // 选中新标签页
             TabItem newTab = tabs[tabId];
             newTab.Select();
-            styler.ApplyStyle(newTab, true);
+            if (enableStyler)
+            {
+                styler.ApplyStyle(newTab, true);
+            }
             
             // 更新当前标签页ID
             string previousTabId = CurrentTabId;
@@ -278,9 +293,12 @@ namespace UGC.Tabview
             this.styler = styler ?? new TabViewStyler();
             
             // 应用样式到所有标签页
-            foreach (var tabItem in tabs.Values)
+            if (enableStyler)
             {
-                this.styler.ApplyStyle(tabItem, tabItem.IsSelected);
+                foreach (var tabItem in tabs.Values)
+                {
+                    this.styler.ApplyStyle(tabItem, tabItem.IsSelected);
+                }
             }
         }
         

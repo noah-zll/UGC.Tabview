@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace UGC.Tabview
 {
@@ -34,6 +35,11 @@ namespace UGC.Tabview
         /// 文本组件
         /// </summary>
         private Text textComponent;
+
+        /// <summary>
+        /// TMP文本组件
+        /// </summary>
+        private TMP_Text tmpTextComponent;
         
         /// <summary>
         /// 图片组件
@@ -54,6 +60,7 @@ namespace UGC.Tabview
             // 获取组件
             buttonComponent = button.GetComponent<Button>();
             textComponent = button.GetComponentInChildren<Text>();
+            tmpTextComponent = button.GetComponentInChildren<TMP_Text>();
             imageComponent = button.GetComponent<Image>();
             
             if (buttonComponent == null)
@@ -120,6 +127,11 @@ namespace UGC.Tabview
             if (textComponent != null)
             {
                 textComponent.color = textColor;
+            }
+
+            if (tmpTextComponent != null)
+            {
+                tmpTextComponent.color = textColor;
             }
         }
     }
