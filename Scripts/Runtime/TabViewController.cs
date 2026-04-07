@@ -12,38 +12,38 @@ namespace UGC.Tabview
     public class TabViewController : MonoBehaviour
     {
         #region 属性和字段
-        
+
         /// <summary>
         /// 标签页集合
         /// </summary>
         private Dictionary<string, TabItem> tabs = new Dictionary<string, TabItem>();
-        
+
         /// <summary>
         /// 页面集合（页面切换模式）
         /// </summary>
         private Dictionary<string, GameObject> pages = new Dictionary<string, GameObject>();
-        
+
         /// <summary>
         /// 数据提供者（数据刷新模式）
         /// </summary>
         private ITabDataProvider dataProvider;
-        
+
         /// <summary>
         /// 当前选中的标签页ID
         /// </summary>
         public string CurrentTabId { get; private set; }
-        
+
         /// <summary>
         /// 标签页数量
         /// </summary>
         public int TabCount => tabs.Count;
-        
+
         /// <summary>
         /// 标签页模式
         /// </summary>
         [SerializeField]
         private TabViewMode mode = TabViewMode.PageSwitch;
-        
+
         /// <summary>
         /// 标签页模式
         /// </summary>
@@ -52,7 +52,7 @@ namespace UGC.Tabview
             get { return mode; }
             private set { mode = value; }
         }
-        
+
         /// <summary>
         /// 是否启用样式器
         /// </summary>
@@ -63,40 +63,40 @@ namespace UGC.Tabview
         /// 样式器
         /// </summary>
         private TabViewStyler styler = new TabViewStyler();
-        
+
         /// <summary>
         /// 动画器
         /// </summary>
         private TabViewAnimator animator = new TabViewAnimator();
-        
+
         /// <summary>
         /// 当前数据
         /// </summary>
         private object currentData;
-        
+
         #endregion
-        
+
         #region 事件
-        
+
         /// <summary>
         /// 标签页切换事件
         /// </summary>
         public UnityEvent<string> OnTabChanged = new UnityEvent<string>();
-        
+
         /// <summary>
         /// 页面切换事件（页面切换模式）
         /// </summary>
         public UnityEvent<string> OnPageChanged = new UnityEvent<string>();
-        
+
         /// <summary>
         /// 数据切换事件（数据刷新模式）
         /// </summary>
         public UnityEvent<string> OnDataChanged = new UnityEvent<string>();
-        
+
         #endregion
-        
+
         #region Unity生命周期
-        
+
         private void Start()
         {
             // 确保样式器和动画器已初始化
@@ -105,11 +105,11 @@ namespace UGC.Tabview
             if (animator == null)
                 animator = new TabViewAnimator();
         }
-        
+
         #endregion
-        
+
         #region 公共方法
-        
+
         /// <summary>
         /// 添加标签页
         /// </summary>
@@ -123,50 +123,50 @@ namespace UGC.Tabview
                 Debug.LogError("Tab ID cannot be null or empty");
                 return null;
             }
-            
+
             if (tabButton == null)
             {
                 Debug.LogError($"Tab button for {tabId} cannot be null");
                 return null;
             }
-            
+
             // 确保按钮对象有Button组件
             if (tabButton.GetComponent<UnityEngine.UI.Button>() == null)
             {
                 Debug.LogError($"Tab button for {tabId} must have a Button component");
                 return null;
             }
-            
+
             if (tabs.ContainsKey(tabId))
             {
                 Debug.LogWarning($"Tab with ID {tabId} already exists, replacing it");
                 RemoveTab(tabId);
             }
-            
+
             // 确保样式器已初始化
             if (styler == null)
             {
                 styler = new TabViewStyler();
             }
-            
+
             // 创建标签页
             TabItem tabItem = new TabItem(tabId, tabButton);
-            
+
             // 设置点击事件
             tabItem.SetOnClickListener(() => SwitchToTab(tabId));
-            
+
             // 应用样式
             if (enableStyler)
             {
                 styler.ApplyStyle(tabItem, false);
             }
-            
+
             // 添加到集合
             tabs.Add(tabId, tabItem);
-            
+
             return tabItem;
         }
-        
+
         /// <summary>
         /// 移除标签页
         /// </summary>
@@ -178,7 +178,7 @@ namespace UGC.Tabview
             {
                 return false;
             }
-            
+
             // 如果移除的是当前选中的标签页，则切换到其他标签页
             if (tabId == CurrentTabId && tabs.Count > 1)
             {
@@ -191,19 +191,19 @@ namespace UGC.Tabview
                     }
                 }
             }
-            
+
             // 从集合中移除
             tabs.Remove(tabId);
-            
+
             // 如果是页面切换模式，同时移除对应的页面
             if (Mode == TabViewMode.PageSwitch && pages.ContainsKey(tabId))
             {
                 pages.Remove(tabId);
             }
-            
+
             return true;
         }
-        
+
         /// <summary>
         /// 切换到指定标签页
         /// </summary>
@@ -215,13 +215,13 @@ namespace UGC.Tabview
                 Debug.LogError($"Tab with ID {tabId} does not exist");
                 return;
             }
-            
+
             // 如果已经是当前标签页，则不做任何操作
             if (tabId == CurrentTabId)
             {
                 return;
             }
-            
+
             // 取消选中当前标签页
             if (!string.IsNullOrEmpty(CurrentTabId) && tabs.TryGetValue(CurrentTabId, out TabItem currentTab))
             {
@@ -231,7 +231,7 @@ namespace UGC.Tabview
                     styler.ApplyStyle(currentTab, false);
                 }
             }
-            
+
             // 选中新标签页
             TabItem newTab = tabs[tabId];
             newTab.Select();
@@ -239,27 +239,27 @@ namespace UGC.Tabview
             {
                 styler.ApplyStyle(newTab, true);
             }
-            
+
             // 更新当前标签页ID
             string previousTabId = CurrentTabId;
             CurrentTabId = tabId;
-            
+
             // 根据模式执行不同的操作
             switch (Mode)
             {
                 case TabViewMode.PageSwitch:
                     SwitchToPage(tabId);
                     break;
-                    
+
                 case TabViewMode.DataRefresh:
                     SwitchToData(tabId);
                     break;
             }
-            
+
             // 触发标签页切换事件
             OnTabChanged.Invoke(tabId);
         }
-        
+
         /// <summary>
         /// 获取标签页
         /// </summary>
@@ -271,10 +271,10 @@ namespace UGC.Tabview
             {
                 return tabItem;
             }
-            
+
             return null;
         }
-        
+
         /// <summary>
         /// 设置标签页模式
         /// </summary>
@@ -283,7 +283,7 @@ namespace UGC.Tabview
         {
             Mode = mode;
         }
-        
+
         /// <summary>
         /// 设置样式器
         /// </summary>
@@ -291,7 +291,7 @@ namespace UGC.Tabview
         public void SetStyler(TabViewStyler styler)
         {
             this.styler = styler ?? new TabViewStyler();
-            
+
             // 应用样式到所有标签页
             if (enableStyler)
             {
@@ -301,7 +301,7 @@ namespace UGC.Tabview
                 }
             }
         }
-        
+
         /// <summary>
         /// 设置动画器
         /// </summary>
@@ -310,15 +310,15 @@ namespace UGC.Tabview
         {
             TabViewAnimator oldAnimator = this.animator;
             this.animator = animator ?? new TabViewAnimator();
-            
+
             // 如果从Fade切换到其他类型，需要重置所有页面的CanvasGroup.alpha值
-            if (oldAnimator != null && oldAnimator.AnimationType == AnimationType.Fade && 
+            if (oldAnimator != null && oldAnimator.AnimationType == AnimationType.Fade &&
                 this.animator.AnimationType != AnimationType.Fade)
             {
                 ResetAllPagesCanvasGroupAlpha();
             }
         }
-        
+
         /// <summary>
         /// 重置所有页面的CanvasGroup.alpha值
         /// </summary>
@@ -336,7 +336,7 @@ namespace UGC.Tabview
                 }
             }
         }
-        
+
         /// <summary>
         /// 获取样式器
         /// </summary>
@@ -345,7 +345,7 @@ namespace UGC.Tabview
         {
             return styler;
         }
-        
+
         /// <summary>
         /// 获取动画器
         /// </summary>
@@ -354,11 +354,11 @@ namespace UGC.Tabview
         {
             return animator;
         }
-        
+
         #endregion
-        
+
         #region 页面切换模式
-        
+
         /// <summary>
         /// 添加页面
         /// </summary>
@@ -371,26 +371,26 @@ namespace UGC.Tabview
                 Debug.LogError("Page ID cannot be null or empty");
                 return;
             }
-            
+
             if (pageContent == null)
             {
                 Debug.LogError($"Page content for {pageId} cannot be null");
                 return;
             }
-            
+
             if (pages.ContainsKey(pageId))
             {
                 Debug.LogWarning($"Page with ID {pageId} already exists, replacing it");
                 pages.Remove(pageId);
             }
-            
+
             // 初始时隐藏页面
             pageContent.SetActive(false);
-            
+
             // 添加到集合
             pages.Add(pageId, pageContent);
         }
-        
+
         /// <summary>
         /// 移除页面
         /// </summary>
@@ -400,7 +400,7 @@ namespace UGC.Tabview
         {
             return pages.Remove(pageId);
         }
-        
+
         /// <summary>
         /// 切换到指定页面
         /// </summary>
@@ -412,7 +412,7 @@ namespace UGC.Tabview
                 Debug.LogError($"Page with ID {pageId} does not exist");
                 return;
             }
-            
+
             // 隐藏当前页面
             foreach (var page in pages.Values)
             {
@@ -421,19 +421,19 @@ namespace UGC.Tabview
                     StartCoroutine(animator.PlayPageExitAnimation(page));
                 }
             }
-            
+
             // 显示新页面
             GameObject newPage = pages[pageId];
             StartCoroutine(animator.PlayPageEnterAnimation(newPage));
-            
+
             // 触发页面切换事件
             OnPageChanged.Invoke(pageId);
         }
-        
+
         #endregion
-        
+
         #region 数据刷新模式
-        
+
         /// <summary>
         /// 设置数据提供者
         /// </summary>
@@ -442,7 +442,7 @@ namespace UGC.Tabview
         {
             this.dataProvider = dataProvider;
         }
-        
+
         /// <summary>
         /// 切换到指定数据
         /// </summary>
@@ -454,14 +454,14 @@ namespace UGC.Tabview
                 Debug.LogError("Data provider is not set");
                 return;
             }
-            
+
             // 获取数据
             currentData = dataProvider.GetData(dataId);
-            
+
             // 触发数据切换事件
             OnDataChanged.Invoke(dataId);
         }
-        
+
         /// <summary>
         /// 刷新当前数据
         /// </summary>
@@ -471,17 +471,17 @@ namespace UGC.Tabview
             {
                 return;
             }
-            
+
             // 刷新数据
             dataProvider.RefreshData(CurrentTabId);
-            
+
             // 重新获取数据
             currentData = dataProvider.GetData(CurrentTabId);
-            
+
             // 触发数据切换事件
             OnDataChanged.Invoke(CurrentTabId);
         }
-        
+
         /// <summary>
         /// 获取当前数据
         /// </summary>
@@ -490,7 +490,16 @@ namespace UGC.Tabview
         {
             return currentData;
         }
-        
+
+        /// <summary>
+        /// 清除当前标签页缓存
+        /// </summary>
+        public void ClearCurrentTab()
+        {
+            CurrentTabId = null;
+            currentData = null;
+        }
+
         #endregion
     }
 }
