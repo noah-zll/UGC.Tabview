@@ -365,9 +365,12 @@ namespace UGC.Tabview.Editor
             
             if (EditorGUI.EndChangeCheck())
             {
+                Undo.RecordObject(controller, "Change TabView Animation");
                 TabViewAnimator animator = new TabViewAnimator();
                 animator.SetPageSwitchAnimation(selectedAnimationType, animationDuration);
                 controller.SetAnimator(animator);
+                EditorUtility.SetDirty(controller);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(controller);
             }
         }
     }

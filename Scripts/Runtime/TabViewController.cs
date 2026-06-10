@@ -67,6 +67,7 @@ namespace UGC.Tabview
         /// <summary>
         /// 动画器
         /// </summary>
+        [SerializeField]
         private TabViewAnimator animator = new TabViewAnimator();
 
         /// <summary>
